@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ramons03/bloxspin#readme",
   "dependencies": {
+    "axios": "^0.21.1",
     "discord.js": "^12.5.1",
     "quick-yt-search": "^1.0.2",
     "youtube-live-chat": "^1.0.3"
