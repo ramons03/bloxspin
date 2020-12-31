@@ -1,0 +1,24 @@
+{
+  "name": "bloxspin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ramons03/bloxspin.git"
+  },
+  "author": "ramons03",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ramons03/bloxspin/issues"
+  },
+  "homepage": "https://github.com/ramons03/bloxspin#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "quick-yt-search": "^1.0.2",
+    "youtube-live-chat": "^1.0.3"
+  }
+}
