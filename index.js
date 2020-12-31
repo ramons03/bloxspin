@@ -12,7 +12,7 @@ var fetchVideoInfo = require('youtube-info');
 const YoutubeSearcher = new QuickYtSearch({
     YtApiKey: config.YOUTUBE_KEY, // Place your YouTube API key here
 });
-
+var yt = null;
 // if(YoutubeSearcher.isVideoUrl('https://www.youtube.com/watch?v=nA6LhIQFPKY') === true) {
 //     console.log('OMG, it\'s a video');
 // } else {
@@ -83,24 +83,36 @@ client.on("message", function (message) {
     }
     else if (command === "yt") {
         var querystring = args.join(' ');
-        const yt = new YouTube(querystring, config.YOUTUBE_KEY);
+        yt = new YouTube(querystring, config.YOUTUBE_KEY);
 
         yt.on('ready', () => {
-            console.log('ready!');
-            message.reply(`ready!`);
+            console.log('ready! iniciando busqueda');
+            message.reply(`ready! iniciando busqueda`);
             yt.listen(1000);
         })
 
         yt.on('message', data => {
-            console.log(data.snippet.displayMessage);
+            let re = new RegExp('^.{6,7}$');
+            var mensaje = data.snippet.displayMessage;
+            //console.log(`Test ${data.snippet.displayMessage}:` + re.test(mensaje));
+            console.log(mensaje);
+            console.log(re.test(mensaje));
             //message.reply(`${data.snippet.displayMessage}`);
-            message.channel.send(`${data.snippet.displayMessage}`)
+            var escodigo = re.test(mensaje);
+            if(escodigo){
+                message.channel.send(`${data.snippet.displayMessage}`);
+            }
+            //message.channel.send(`${re.test(mensaje)}`);
         })
 
         yt.on('error', error => {
             console.error(error);
             message.reply(`Error ${error}`);
         })
+    }
+    else if (command === "ytstop") {
+        yt.stop();
+        message.reply(`la busqueda se detuvo`);
     }
 });
 
