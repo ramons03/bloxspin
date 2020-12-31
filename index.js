@@ -6,6 +6,8 @@ const Discord = require("discord.js");
 const config = require("./config.json");
 const client = new Discord.Client();
 const prefix = "!";
+var fetchVideoInfo = require('youtube-info');
+
 
 const YoutubeSearcher = new QuickYtSearch({
     YtApiKey: config.YOUTUBE_KEY, // Place your YouTube API key here
@@ -37,7 +39,7 @@ async function buscarCanal(youtubeChannel) {
         throw new Error('You must enter a search term to find channel.');
     };
     try {
-        var urlsearch = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${youtubeChannel}&type=channel&key=${config.YOUTUBE_KEY}&eventType=live`;
+        var urlsearch = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${youtubeChannel}&type=channel&key=${config.YOUTUBE_KEY}`;
         console.log(urlsearch);
         const response = await axios.get(urlsearch);
         //console.log(response);
@@ -48,7 +50,7 @@ async function buscarCanal(youtubeChannel) {
 }
 
 
-client.on("message", function(message) {
+client.on("message", function (message) {
     if (message.author.bot) return;
     if (!message.content.startsWith(prefix)) return;
     const commandBody = message.content.slice(prefix.length);
@@ -78,7 +80,27 @@ client.on("message", function(message) {
         } catch (error) {
             message.reply(`Error ${error}`);
         };
+    }
+    else if (command === "yt") {
+        var querystring = args.join(' ');
+        const yt = new YouTube(querystring, config.YOUTUBE_KEY);
 
+        yt.on('ready', () => {
+            console.log('ready!');
+            message.reply(`ready!`);
+            yt.listen(1000);
+        })
+
+        yt.on('message', data => {
+            console.log(data.snippet.displayMessage);
+            //message.reply(`${data.snippet.displayMessage}`);
+            message.channel.send(`${data.snippet.displayMessage}`)
+        })
+
+        yt.on('error', error => {
+            console.error(error);
+            message.reply(`Error ${error}`);
+        })
     }
 });
 
