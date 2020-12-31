@@ -112,6 +112,7 @@ client.on("message", function (message) {
     }
     else if (command === "ytstop") {
         yt.stop();
+        console.log('la busqueda se detuvo');
         message.reply(`la busqueda se detuvo`);
     }
 });
