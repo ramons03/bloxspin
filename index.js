@@ -8,6 +8,9 @@ const client = new Discord.Client();
 const prefix = "!";
 var fetchVideoInfo = require('youtube-info');
 
+function isUpperCase(str) {
+    return str === str.toUpperCase();
+}
 
 const YoutubeSearcher = new QuickYtSearch({
     YtApiKey: config.YOUTUBE_KEY, // Place your YouTube API key here
@@ -108,6 +111,10 @@ client.on("message", function (message) {
         yt.on('error', error => {
             console.error(error);
             message.reply(`Error ${error}`);
+	    yt.stop();
+            console.log('la busqueda se detuvo');
+            message.reply(`la busqueda se detuvo`);
+
         })
     }
     else if (command === "ytstop") {
