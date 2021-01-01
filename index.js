@@ -37,7 +37,7 @@ const YoutubeSearcher = new QuickYtSearch({
 var yt = null;
 
 
-const fs = require('fs');
+const fs = require('fs-extra');
 
 
 
@@ -139,6 +139,12 @@ client.on("message", function (message) {
         if(parseInt(ytkeyparam)  === 2){
             youtubekey = config.YOUTUBE_KEY2;
         }
+        if(parseInt(ytkeyparam)  === 3){
+            youtubekey = config.YOUTUBE_KEY3;
+        }
+        if(parseInt(ytkeyparam)  === 4){
+            youtubekey = config.YOUTUBE_KEY4;
+        }
 
         buscarCanal(querystringparam).then(channel => {
             console.log(channel);
@@ -188,7 +194,10 @@ client.on("message", function (message) {
                     
                     if((!esmayuscula && !esminuscula && !tieneespacios && !esmencion)){
                         var existecodigo = false;
-                        const filecontent = fs.readFileSync('./spins/01012021.txt', 'utf8');
+                        var now = new Date();
+                        var file_name = './spins/' + now.getFullYear() + now.getMonth() + now.getDate() +'.txt'
+                        fs.ensureFileSync(file_name);
+                        const filecontent = fs.readFileSync(file_name, 'utf8');
                         console.log(`buscar si existe el codigo: ${seiscaracteres} \n ${filecontent}`);
                         if(filecontent.indexOf(seiscaracteres) >= 0){
                             console.log('ya existe el codigo');
@@ -202,7 +211,7 @@ client.on("message", function (message) {
                             //message.channel.send(`**${author}** | ${data.snippet.displayMessage}`);
                             message.channel.send(`${formatedmessage}`);
                             message.channel.send(`${codigo}`);
-                            fs.appendFile('./spins/01012021.txt', seiscaracteres + '\n', function (err) {
+                            fs.appendFile(file_name, seiscaracteres + '\n', function (err) {
                                 if (err) throw err;
                                 console.log('Saved!');
                             });
