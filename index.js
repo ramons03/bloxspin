@@ -11,6 +11,20 @@ var fetchVideoInfo = require('youtube-info');
 function isUpperCase(str) {
     return str === str.toUpperCase();
 }
+function isLowerCase(str) {
+    return str === str.toLowerCase();
+}
+
+//Assumes nothing and can handle numbers and symbols
+function isCapitalized(str) {
+    var rex = /^[A-Z]/
+    return rex.test(str);
+}
+// //Assumes that a string is made up of only letters
+// function isCapitalized(str) {
+//     var char = str[0]; 
+//     return char.toUpperCase() == char;
+// }
 
 const YoutubeSearcher = new QuickYtSearch({
     YtApiKey: config.YOUTUBE_KEY, // Place your YouTube API key here
@@ -85,8 +99,20 @@ client.on("message", function (message) {
         };
     }
     else if (command === "yt") {
-        var querystring = args.join(' ');
-        yt = new YouTube(querystring, config.YOUTUBE_KEY);
+        console.log('ye command');
+        var querystringparam = args[0];
+        console.log('querystringparam', querystringparam);
+        var ytkeyparam = args[1];
+        console.log('ytkeyparam', ytkeyparam);
+        var youtubekey = "";
+        if(parseInt(ytkeyparam) === 1){
+            youtubekey = config.YOUTUBE_KEY;
+        }
+        if(parseInt(ytkeyparam)  === 2){
+            youtubekey = config.YOUTUBE_KEY2;
+        }
+        console.log('youtubekey', youtubekey);
+        yt = new YouTube(querystringparam, youtubekey);
 
         yt.on('ready', () => {
             console.log('ready! iniciando busqueda');
@@ -95,16 +121,28 @@ client.on("message", function (message) {
         })
 
         yt.on('message', data => {
-            let re = new RegExp('^.{6,7}$');
+            //let re = new RegExp('^.{6,7}$');
             var mensaje = data.snippet.displayMessage;
             //console.log(`Test ${data.snippet.displayMessage}:` + re.test(mensaje));
             console.log(mensaje);
-            console.log(re.test(mensaje));
-            //message.reply(`${data.snippet.displayMessage}`);
-            var escodigo = re.test(mensaje);
-            if(escodigo){
-                message.channel.send(`${data.snippet.displayMessage}`);
+            if(mensaje.length > 6){
+                var seiscaracteres = mensaje.substring(0,6);
+                var esmayuscula = isUpperCase(seiscaracteres);
+                var esminuscula = isLowerCase(seiscaracteres);
+                var tieneespacios = /\s/.test(seiscaracteres);
+                var esmencion = (seiscaracteres.substring(0,1) === '@');
+                var iscapitalized = isCapitalized(seiscaracteres);
+                if(!esmayuscula && !esminuscula && !tieneespacios && !esmencion && !iscapitalized){
+                    message.channel.send(`${data.snippet.displayMessage}`);
+                }
             }
+
+            //console.log(re.test(mensaje));
+            //message.reply(`${data.snippet.displayMessage}`);
+            // var escodigo = re.test(mensaje);
+            // if(escodigo){
+            //     message.channel.send(`${data.snippet.displayMessage}`);
+            // }
             //message.channel.send(`${re.test(mensaje)}`);
         })
 
