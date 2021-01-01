@@ -189,7 +189,7 @@ client.on("message", function (message) {
                     if((!esmayuscula && !esminuscula && !tieneespacios && !esmencion)){
                         var existecodigo = false;
                         const filecontent = fs.readFileSync('./spins/01012021.txt', 'utf8');
-                        console.log(`buscar si existe el codigo: ${seiscaracteres} ${filecontent}`);
+                        console.log(`buscar si existe el codigo: ${seiscaracteres} \n ${filecontent}`);
                         if(filecontent.indexOf(seiscaracteres) >= 0){
                             console.log('ya existe el codigo');
                             existecodigo = true;
