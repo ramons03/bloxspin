@@ -14,17 +14,22 @@ function isUpperCase(str) {
 function isLowerCase(str) {
     return str === str.toLowerCase();
 }
-
-//Assumes nothing and can handle numbers and symbols
-function isCapitalized(str) {
-    var rex = /^[A-Z]/
-    return rex.test(str);
+function isNumber(n){
+    return Number(n)=== n;
 }
-// //Assumes that a string is made up of only letters
+//Assumes nothing and can handle numbers and symbols
 // function isCapitalized(str) {
-//     var char = str[0]; 
-//     return char.toUpperCase() == char;
+//     var rex = /^[A-Z]/
+//     return rex.test(str);
 // }
+// //Assumes that a string is made up of only letters
+function isCapitalized(str) {
+    var char = str[0]; 
+    if(!isNumber(char)){
+        return char.toUpperCase() === char;
+    }
+    return false;
+}
 
 const YoutubeSearcher = new QuickYtSearch({
     YtApiKey: config.YOUTUBE_KEY, // Place your YouTube API key here
@@ -73,7 +78,7 @@ async function buscarCanal(youtubeChannel) {
         var urlsearch = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${youtubeChannel}&key=${config.YOUTUBE_KEY}`;
         console.log(urlsearch);
         const response = await axios.get(urlsearch);
-        //console.log(response);
+        //console.log(response.data);
         return new ChannelElement(response);
     } catch (error) {
         throw new Error('An error occurred while retrieving the channel.');
@@ -131,56 +136,55 @@ client.on("message", function (message) {
             console.log(channel.title);
             console.log(channel.description);
             message.reply(`canal encontrado ${channel.title}`);
-        });
+            message.reply(`${channel.description}`);
 
-        console.log('youtubekey', youtubekey);
-        yt = new YouTube(querystringparam, youtubekey);
-
-        yt.on('ready', () => {
-            console.log('ready! iniciando busqueda');
-            message.reply(`ready! iniciando busqueda`);
-            yt.listen(1000);
-        })
-
-        yt.on('message', data => {
-            //let re = new RegExp('^.{6,7}$');
-            console.log(data);
-            var author = data.authorDetails.displayName;
-            var esmoderador = data.authorDetails.isChatModerator;
-            var esowner = data.authorDetails.isChatOwner;
-            var essponsor = data.authorDetails.isChatSponsor;
-            var esverificado = data.authorDetails.isVerified;
-            author = `${(esverificado?'verficado':'')}${(esowner?'dueño':'')}${(essponsor?'sponsor':'')}${(esmoderador?'moderador':'')}` + author;
-            var mensaje = `$${author}|${data.snippet.displayMessage}`;
-            //console.log(`Test ${data.snippet.displayMessage}:` + re.test(mensaje));
-            console.log(mensaje);
-            if(mensaje.length > 6){
-                var seiscaracteres = mensaje.substring(0,6);
-                var esmayuscula = isUpperCase(seiscaracteres);
-                var esminuscula = isLowerCase(seiscaracteres);
-                var tieneespacios = /\s/.test(seiscaracteres);
-                var esmencion = (seiscaracteres.substring(0,1) === '@');
-                var iscapitalized = isCapitalized(seiscaracteres);
-                if(!esmayuscula && !esminuscula && !tieneespacios && !esmencion && !iscapitalized){
-                    message.channel.send(`${data.snippet.displayMessage}`);
+            console.log('youtubekey', youtubekey);
+            yt = new YouTube(querystringparam, youtubekey);
+    
+            yt.on('ready', () => {
+                console.log('ready! iniciando busqueda');
+                message.reply(`ready! iniciando busqueda`);
+                yt.listen(1000);
+            });
+            yt.on('message', data => {
+                //let re = new RegExp('^.{6,7}$');
+                //console.log(data);
+                var author = data.authorDetails.displayName;
+                var esmoderador = data.authorDetails.isChatModerator;
+                var esowner = data.authorDetails.isChatOwner;
+                var essponsor = data.authorDetails.isChatSponsor;
+                var esverificado = data.authorDetails.isVerified;
+                author = `${(esverificado?'verficado':'')}${(esowner?'dueño':'')}${(essponsor?'sponsor':'')}${(esmoderador?'moderador':'')}` + author;
+                var mensaje = `${data.snippet.displayMessage}`;
+                //console.log(`Test ${data.snippet.displayMessage}:` + re.test(mensaje));
+                console.log(mensaje);
+                if(mensaje.length > 5){
+                    var seiscaracteres = mensaje.substring(0,6);
+                    var esmayuscula = isUpperCase(seiscaracteres);
+                    var esminuscula = isLowerCase(seiscaracteres);
+                    var tieneespacios = /\s/.test(seiscaracteres);
+                    var esmencion = (seiscaracteres.substring(0,1) === '@');
+                    var iscapitalized = isCapitalized(seiscaracteres);
+                    console.log(`${seiscaracteres}: ${esmayuscula} ${esminuscula} ${tieneespacios} ${esmencion} ${iscapitalized}`);
+                    if(!esmayuscula && !esminuscula && !tieneespacios && !esmencion && !iscapitalized){
+                        var formatedmessage = `**${author}** | ${data.snippet.displayMessage}`;
+                        var codigo = `\`\`\`CSS
+                        ${seiscaracteres}
+                        \`\`\``
+                        //message.channel.send(`**${author}** | ${data.snippet.displayMessage}`);
+                        message.channel.send(`${formatedmessage}`);
+                        message.channel.send(`${codigo}`);
+                    }
                 }
-            }
-
-            //console.log(re.test(mensaje));
-            //message.reply(`${data.snippet.displayMessage}`);
-            // var escodigo = re.test(mensaje);
-            // if(escodigo){
-            //     message.channel.send(`${data.snippet.displayMessage}`);
-            // }
-            //message.channel.send(`${re.test(mensaje)}`);
-        })
-
-        yt.on('error', error => {
-            console.error(error);
-            message.reply(`Error ${error}`);
-            yt.stop();
-            console.log('la busqueda se detuvo');
-            message.reply(`la busqueda se detuvo`);
+            })
+    
+            yt.on('error', error => {
+                console.error(error);
+                message.reply(`Error ${error}`);
+                yt.stop();
+                console.log('la busqueda se detuvo');
+                message.reply(`la busqueda se detuvo`);
+            });
         });
     }
     else if (command === "ytstop") {
