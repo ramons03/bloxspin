@@ -35,6 +35,13 @@ const YoutubeSearcher = new QuickYtSearch({
     YtApiKey: config.YOUTUBE_KEY, // Place your YouTube API key here
 });
 var yt = null;
+
+
+const fs = require('fs');
+
+
+
+
 // if(YoutubeSearcher.isVideoUrl('https://www.youtube.com/watch?v=nA6LhIQFPKY') === true) {
 //     console.log('OMG, it\'s a video');
 // } else {
@@ -76,12 +83,15 @@ async function buscarCanal(youtubeChannel) {
     };
     try {
         var urlsearch = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${youtubeChannel}&key=${config.YOUTUBE_KEY}`;
+        console.log('buscarCanal');
         console.log(urlsearch);
         const response = await axios.get(urlsearch);
         //console.log(response.data);
         return new ChannelElement(response);
     } catch (error) {
-        throw new Error('An error occurred while retrieving the channel.');
+        //throw new Error('An error occurred while retrieving the channel.');
+        console.log('error', error);
+        return {};
     };
 }
 
@@ -160,20 +170,68 @@ client.on("message", function (message) {
                 console.log(mensaje);
                 if(mensaje.length > 5){
                     var seiscaracteres = mensaje.substring(0,6);
+
+                    let regextest = new RegExp('[a-zA-Z0-9\-_]{6}$');
+                    var esregex = regextest.test(mensaje);
+                    if(esregex){
+                        var match = regextest.exec(mensaje);
+                        console.log(match[0]); // abc
+                        seiscaracteres = match[0];
+                    }
+                    console.log('seiscaracteres', seiscaracteres);
                     var esmayuscula = isUpperCase(seiscaracteres);
                     var esminuscula = isLowerCase(seiscaracteres);
                     var tieneespacios = /\s/.test(seiscaracteres);
                     var esmencion = (seiscaracteres.substring(0,1) === '@');
                     var iscapitalized = isCapitalized(seiscaracteres);
                     console.log(`${seiscaracteres}: ${esmayuscula} ${esminuscula} ${tieneespacios} ${esmencion} ${iscapitalized}`);
-                    if(!esmayuscula && !esminuscula && !tieneespacios && !esmencion && !iscapitalized){
-                        var formatedmessage = `**${author}** | ${data.snippet.displayMessage}`;
-                        var codigo = `\`\`\`CSS
-                        ${seiscaracteres}
-                        \`\`\``
-                        //message.channel.send(`**${author}** | ${data.snippet.displayMessage}`);
-                        message.channel.send(`${formatedmessage}`);
-                        message.channel.send(`${codigo}`);
+                    
+                    if((!esmayuscula && !esminuscula && !tieneespacios && !esmencion)){
+                        var existecodigo = false;
+                        const filecontent = fs.readFileSync('./spins/01012021.txt', 'utf8');
+                        console.log(`buscar si existe el codigo: ${seiscaracteres} ${filecontent}`);
+                        if(filecontent.indexOf(seiscaracteres) >= 0){
+                            console.log('ya existe el codigo');
+                            existecodigo = true;
+                        }
+                        if(!existecodigo){
+                            var formatedmessage = `**${author}** | ${data.snippet.displayMessage}`;
+                            var codigo = `\`\`\`CSS
+                            ${seiscaracteres}
+                            \`\`\``
+                            //message.channel.send(`**${author}** | ${data.snippet.displayMessage}`);
+                            message.channel.send(`${formatedmessage}`);
+                            message.channel.send(`${codigo}`);
+                            fs.appendFile('./spins/01012021.txt', seiscaracteres + '\n', function (err) {
+                                if (err) throw err;
+                                console.log('Saved!');
+                            });
+                        }
+                        // fs.readFileSync('./spins/01012021.txt', function (err, data) {
+                        //     var existecodigo = false;
+                        //     if (err) throw err;
+                        //     console.log(`buscar si existe el codigo ${seiscaracteres}`);
+                        //     if(data.indexOf(seiscaracteres) >= 0){
+                        //         console.log('ya existe el codigo');
+                        //         existecodigo = true;
+                        //     }
+                        //     return existecodigo;
+                        // }).then(result => {
+                        //     console.log('fin leer archivo'. result);
+                        //     if(!existecodigo){
+                        //         var formatedmessage = `**${author}** | ${data.snippet.displayMessage}`;
+                        //         var codigo = `\`\`\`CSS
+                        //         ${seiscaracteres}
+                        //         \`\`\``
+                        //         //message.channel.send(`**${author}** | ${data.snippet.displayMessage}`);
+                        //         message.channel.send(`${formatedmessage}`);
+                        //         message.channel.send(`${codigo}`);
+                        //         fs.appendFile('./spins/01012021.txt', seiscaracteres + '\n', function (err) {
+                        //             if (err) throw err;
+                        //             console.log('Saved!');
+                        //         });
+                        //     }
+                        // });
                     }
                 }
             })
@@ -185,6 +243,8 @@ client.on("message", function (message) {
                 console.log('la busqueda se detuvo');
                 message.reply(`la busqueda se detuvo`);
             });
+        }).catch(err => {
+            console.log('error', err);
         });
     }
     else if (command === "ytstop") {
