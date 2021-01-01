@@ -51,12 +51,26 @@ var yt = null;
 // yt.on('error', error => {
 //   console.error(error)
 // })
+// async function buscarCanal(youtubeChannel) {
+//     if (!youtubeChannel) {
+//         throw new Error('You must enter a search term to find channel.');
+//     };
+//     try {
+//         var urlsearch = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${youtubeChannel}&type=channel&key=${config.YOUTUBE_KEY}`;
+//         console.log(urlsearch);
+//         const response = await axios.get(urlsearch);
+//         //console.log(response);
+//         return new ChannelElement(response);
+//     } catch (error) {
+//         throw new Error('An error occurred while retrieving the channel.');
+//     };
+// }
 async function buscarCanal(youtubeChannel) {
     if (!youtubeChannel) {
         throw new Error('You must enter a search term to find channel.');
     };
     try {
-        var urlsearch = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${youtubeChannel}&type=channel&key=${config.YOUTUBE_KEY}`;
+        var urlsearch = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${youtubeChannel}&key=${config.YOUTUBE_KEY}`;
         console.log(urlsearch);
         const response = await axios.get(urlsearch);
         //console.log(response);
@@ -65,7 +79,6 @@ async function buscarCanal(youtubeChannel) {
         throw new Error('An error occurred while retrieving the channel.');
     };
 }
-
 
 client.on("message", function (message) {
     if (message.author.bot) return;
@@ -111,6 +124,15 @@ client.on("message", function (message) {
         if(parseInt(ytkeyparam)  === 2){
             youtubekey = config.YOUTUBE_KEY2;
         }
+
+        buscarCanal(querystringparam).then(channel => {
+            console.log(channel);
+            console.log(channel.id);
+            console.log(channel.title);
+            console.log(channel.description);
+            message.reply(`canal encontrado ${channel.title}`);
+        });
+
         console.log('youtubekey', youtubekey);
         yt = new YouTube(querystringparam, youtubekey);
 
@@ -122,7 +144,14 @@ client.on("message", function (message) {
 
         yt.on('message', data => {
             //let re = new RegExp('^.{6,7}$');
-            var mensaje = data.snippet.displayMessage;
+            console.log(data);
+            var author = data.authorDetails.displayName;
+            var esmoderador = data.authorDetails.isChatModerator;
+            var esowner = data.authorDetails.isChatOwner;
+            var essponsor = data.authorDetails.isChatSponsor;
+            var esverificado = data.authorDetails.isVerified;
+            author = `${(esverificado?'verficado':'')}${(esowner?'dueño':'')}${(essponsor?'sponsor':'')}${(esmoderador?'moderador':'')}` + author;
+            var mensaje = `$${author}|${data.snippet.displayMessage}`;
             //console.log(`Test ${data.snippet.displayMessage}:` + re.test(mensaje));
             console.log(mensaje);
             if(mensaje.length > 6){
@@ -149,11 +178,10 @@ client.on("message", function (message) {
         yt.on('error', error => {
             console.error(error);
             message.reply(`Error ${error}`);
-	    yt.stop();
+            yt.stop();
             console.log('la busqueda se detuvo');
             message.reply(`la busqueda se detuvo`);
-
-        })
+        });
     }
     else if (command === "ytstop") {
         yt.stop();
