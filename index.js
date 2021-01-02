@@ -188,8 +188,10 @@ client.on("message", function (message) {
             console.log(channel.id);
             console.log(channel.title);
             console.log(channel.description);
-            message.reply(`canal encontrado ${channel.title}`);
-            message.reply(`${channel.description}`);
+            message.reply(`canal encontrado: ${channel.title}`);
+            message.reply(`descripcion: ${channel.description}`);
+            message.reply(`viewers: ${channel.viewCount}`);
+            message.reply(`subscribers: ${channel.subscriberCount}`);
 
             console.log('youtubekey', youtubekey);
             yt = new YouTube(querystringparam, youtubekey);

@@ -8,8 +8,11 @@ class ChannelElement {
             this.defaultThumbnail = response.data.items[0].snippet.thumbnails.default.url;
             this.mediumThumbnail = response.data.items[0].snippet.thumbnails.medium.url;
             this.highThumbnail = response.data.items[0].snippet.thumbnails.high.url;
-            this.title = response.data.items[0].snippet.channelTitle;
+            this.title = response.data.items[0].snippet.title;
             this.url = `https://www.youtube.com/playlist?list=${this.id}`;
+            this.country = response.data.items[0].snippet.country;
+            this.viewCount = response.data.items[0].statistics.viewCount;
+            this.subscriberCount = response.data.items[0].statistics.subscriberCount;
     };
 };
 
