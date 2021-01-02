@@ -9,7 +9,8 @@ const client = new Discord.Client();
 const prefix = "!";
 var fetchVideoInfo = require('youtube-info');
 
-var codigosexistentes = [];
+const codigosexistentes = new Set();
+//var codigosexistentes = [];
 function isUpperCase(str) {
     return str === str.toUpperCase();
 }
@@ -27,8 +28,9 @@ function isNumber(n){
 // //Assumes that a string is made up of only letters
 function isCapitalized(str) {
     var char = str[0]; 
+    var palabra = str.substring(1,6);
     if(!isNumber(char)){
-        return char.toUpperCase() === char;
+        return char.toUpperCase() === char && isLowerCase(palabra);
     }
     return false;
 }
@@ -38,10 +40,43 @@ const YoutubeSearcher = new QuickYtSearch({
 });
 var yt = null;
 
+function crawlFiles(path) {
+    var files = filelist(path);
+    var filepaths = [];
+
+    var cache = new Set();
+
+    files.forEach((file) => {
+        var fullname = '' + path + '/' + file + '';
+        filepaths.push(fullname);
+    });
+    filepaths.forEach(fp => {
+        console.log('fp', fp);
+        const filecontent = fs.readFileSync(fp, 'utf8');
+        filecontent.toString().split(/\n/).forEach(item => { 
+            console.log('item', item); 
+            codigosexistentes.add(item);
+        });
+        //var obj = readID3(fp);
+        //obj.filepath = fp;
+
+        // var data = JSON.stringify(obj);
+        // if (!cache.has(data)) {
+        //     cache.add(data);
+        //     toTXT('./db2.js', obj);
+        // }
+
+    });
+}
 
 const fs = require('fs-extra');
 
-
+const { r, g, b, w, c, m, y, k } = [
+    ['r', 1], ['g', 2], ['b', 4], ['w', 7],
+    ['c', 6], ['m', 5], ['y', 3], ['k', 0],
+].reduce((cols, col) => ({
+    ...cols,  [col[0]]: f => `\x1b[3${col[1]}m${f}\x1b[0m`
+}), {})
 
 
 // if(YoutubeSearcher.isVideoUrl('https://www.youtube.com/watch?v=nA6LhIQFPKY') === true) {
@@ -172,19 +207,23 @@ client.on("message", function (message) {
                 var esowner = data.authorDetails.isChatOwner;
                 var essponsor = data.authorDetails.isChatSponsor;
                 var esverificado = data.authorDetails.isVerified;
-                author = `${(esverificado?'verficado':'')}${(esowner?'dueño':'')}${(essponsor?'sponsor':'')}${(esmoderador?'moderador':'')}` + author;
+                author = `${(esverificado?'verficado ':'')}${(esowner?'dueño ':'')}${(essponsor?'sponsor ':'')}${(esmoderador?'moderador ':'')}` + author;
                 var mensaje = `${data.snippet.displayMessage}`;
                 //console.log(`Test ${data.snippet.displayMessage}:` + re.test(mensaje));
                 console.log(mensaje);
                 if(mensaje.length > 5){
                     var seiscaracteres = mensaje.substring(0,6);
+                    var expression = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
 
-                    let regextest = new RegExp('[a-zA-Z0-9\-_]{6}$');
-                    var esregex = regextest.test(mensaje);
-                    if(esregex){
-                        var match = regextest.exec(mensaje);
-                        console.log(match[0]); // abc
-                        seiscaracteres = match[0];
+                    var regexurl = new RegExp(expression);
+                    var tieneurl = regexurl.test(mensaje)
+                    //var t = 'www.google.com';
+                    let regexcode = new RegExp('[a-zA-Z0-9\-_]{6}$');
+                    var matchregex = regexcode.test(mensaje);
+                    if(matchregex){
+                        var matchtexts = regexcode.exec(mensaje);
+                        console.log(matchtexts[0]); 
+                        seiscaracteres = matchtexts[0];
                     }
                     console.log('seiscaracteres', seiscaracteres);
                     var esmayuscula = isUpperCase(seiscaracteres);
@@ -192,25 +231,25 @@ client.on("message", function (message) {
                     var tieneespacios = /\s/.test(seiscaracteres);
                     var esmencion = (seiscaracteres.substring(0,1) === '@');
                     var iscapitalized = isCapitalized(seiscaracteres);
-                    console.log(`${seiscaracteres}: ${esmayuscula} ${esminuscula} ${tieneespacios} ${esmencion} ${iscapitalized}`);
+                    console.log(`${seiscaracteres}: ${tieneurl?r('url'):g('url')} ${esmayuscula?r('may'):g('may')} ${esminuscula?r('min'):g('min')} ${tieneespacios?r('esp'):g('esp')} ${esmencion?r('men'):g('men')} ${iscapitalized?r('cap'):g('cap')}`);
                     
-                    if((!esmayuscula && !esminuscula && !tieneespacios && !esmencion)){
-                        var existecodigo = false;
-                        var now = new Date();
-                        //var file_name = './spins/' + now.getFullYear() + now.getMonth() + now.getDate() +'.txt'
+                    if((!tieneurl && !esmayuscula && !esminuscula && !tieneespacios && !esmencion && !iscapitalized)){
+                        //var existecodigo = false;
+                        //var now = new Date();
                         var file_name = './spins/' + moment().format('YYYYDDMM') + ".txt";
                         fs.ensureFileSync(file_name);
-                        const filecontent = fs.readFileSync(file_name, 'utf8');
+                        //const filecontent = fs.readFileSync(file_name, 'utf8');
                         //console.log(`buscar si existe el codigo: ${seiscaracteres} \n ${filecontent}`);
                         console.log(`buscar si existe el codigo: ${seiscaracteres}`);
-                        if(filecontent.indexOf(seiscaracteres) >= 0){
+                        //message.reply(`buscar si existe el codigo: ${seiscaracteres}`);
+                        if(codigosexistentes.has(seiscaracteres)){
                             console.log(`ya existe el codigo ${seiscaracteres}`);
-                            message.reply(`ya existe el codigo ${seiscaracteres}`);
-                            existecodigo = true;
-                        }
-                        if(!existecodigo){
+                            //message.reply(`ya existe el codigo ${seiscaracteres}`);
+                            //existecodigo = true;
+                        }else{
+                            codigosexistentes.add(seiscaracteres);
                             var formatedmessage = `**${author}** | ${data.snippet.displayMessage}`;
-                            var codigo = `\`\`\`CSS
+                            var codigo = `\`\`\`fix
                             ${seiscaracteres}
                             \`\`\``
                             //message.channel.send(`**${author}** | ${data.snippet.displayMessage}`);
@@ -218,9 +257,24 @@ client.on("message", function (message) {
                             message.channel.send(`${codigo}`);
                             fs.appendFile(file_name, seiscaracteres + '\n', function (err) {
                                 if (err) throw err;
-                                console.log('Saved!');
+                                console.log(`${file_name} ${seiscaracteres} Saved!`);
+                                //message.reply(`${seiscaracteres} Saved`);
                             });
                         }
+                        // if(!existecodigo){
+                        //     var formatedmessage = `**${author}** | ${data.snippet.displayMessage}`;
+                        //     var codigo = `\`\`\`fix
+                        //     ${seiscaracteres}
+                        //     \`\`\``
+                        //     //message.channel.send(`**${author}** | ${data.snippet.displayMessage}`);
+                        //     message.channel.send(`${formatedmessage}`);
+                        //     message.channel.send(`${codigo}`);
+                        //     fs.appendFile(file_name, seiscaracteres + '\n', function (err) {
+                        //         if (err) throw err;
+                        //         console.log(`${file_name} ${seiscaracteres} Saved!`);
+                        //         message.reply(`${seiscaracteres} Saved`);
+                        //     });
+                        // }
                     }
                 }
             })
