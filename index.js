@@ -1,3 +1,4 @@
+var moment = require('moment'); // require
 const axios = require('axios');
 const ChannelElement = require('./utils/ChannelElement');
 const YouTube = require('youtube-live-chat');
@@ -8,6 +9,7 @@ const client = new Discord.Client();
 const prefix = "!";
 var fetchVideoInfo = require('youtube-info');
 
+var codigosexistentes = [];
 function isUpperCase(str) {
     return str === str.toUpperCase();
 }
@@ -160,7 +162,7 @@ client.on("message", function (message) {
             yt.on('ready', () => {
                 console.log('ready! iniciando busqueda');
                 message.reply(`ready! iniciando busqueda`);
-                yt.listen(1000);
+                yt.listen(10000);
             });
             yt.on('message', data => {
                 //let re = new RegExp('^.{6,7}$');
@@ -195,12 +197,15 @@ client.on("message", function (message) {
                     if((!esmayuscula && !esminuscula && !tieneespacios && !esmencion)){
                         var existecodigo = false;
                         var now = new Date();
-                        var file_name = './spins/' + now.getFullYear() + now.getMonth() + now.getDate() +'.txt'
+                        //var file_name = './spins/' + now.getFullYear() + now.getMonth() + now.getDate() +'.txt'
+                        var file_name = './spins/' + moment().format('YYYYDDMM') + ".txt";
                         fs.ensureFileSync(file_name);
                         const filecontent = fs.readFileSync(file_name, 'utf8');
-                        console.log(`buscar si existe el codigo: ${seiscaracteres} \n ${filecontent}`);
+                        //console.log(`buscar si existe el codigo: ${seiscaracteres} \n ${filecontent}`);
+                        console.log(`buscar si existe el codigo: ${seiscaracteres}`);
                         if(filecontent.indexOf(seiscaracteres) >= 0){
-                            console.log('ya existe el codigo');
+                            console.log(`ya existe el codigo ${seiscaracteres}`);
+                            message.reply(`ya existe el codigo ${seiscaracteres}`);
                             existecodigo = true;
                         }
                         if(!existecodigo){
@@ -216,31 +221,6 @@ client.on("message", function (message) {
                                 console.log('Saved!');
                             });
                         }
-                        // fs.readFileSync('./spins/01012021.txt', function (err, data) {
-                        //     var existecodigo = false;
-                        //     if (err) throw err;
-                        //     console.log(`buscar si existe el codigo ${seiscaracteres}`);
-                        //     if(data.indexOf(seiscaracteres) >= 0){
-                        //         console.log('ya existe el codigo');
-                        //         existecodigo = true;
-                        //     }
-                        //     return existecodigo;
-                        // }).then(result => {
-                        //     console.log('fin leer archivo'. result);
-                        //     if(!existecodigo){
-                        //         var formatedmessage = `**${author}** | ${data.snippet.displayMessage}`;
-                        //         var codigo = `\`\`\`CSS
-                        //         ${seiscaracteres}
-                        //         \`\`\``
-                        //         //message.channel.send(`**${author}** | ${data.snippet.displayMessage}`);
-                        //         message.channel.send(`${formatedmessage}`);
-                        //         message.channel.send(`${codigo}`);
-                        //         fs.appendFile('./spins/01012021.txt', seiscaracteres + '\n', function (err) {
-                        //             if (err) throw err;
-                        //             console.log('Saved!');
-                        //         });
-                        //     }
-                        // });
                     }
                 }
             })
