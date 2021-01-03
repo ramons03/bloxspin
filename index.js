@@ -228,9 +228,9 @@ client.on("message", function (message) {
                     var tieneurl = regexurl.test(mensaje)
                     //var t = 'www.google.com';
                     //let regexcode = new RegExp('\b[a-zA-Z0-9\-_]{6}\b');
-                    var matchregex = /\b[a-zA-Z0-9]{6,50}\b/.test(mensaje);
+                    var matchregex = /\b[a-zA-Z0-9]{6}\b/.test(mensaje);
                     if(matchregex){
-                        var matchtexts = /\b[a-zA-Z0-9]{6,50}\b/.exec(mensaje);
+                        var matchtexts = /\b[a-zA-Z0-9]{6}\b/.exec(mensaje);
                         console.log(matchtexts[0]); 
                         seiscaracteres = matchtexts[0];
                     }
