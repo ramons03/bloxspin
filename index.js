@@ -192,10 +192,10 @@ client.on("message", function (message) {
             message.reply(`descripcion: ${channel.description}`);
             message.reply(`viewers: ${channel.viewCount}`);
             message.reply(`subscribers: ${channel.subscriberCount}`);
-            var file_channels = `./channels/${channel.id}.txt`;
+            var file_channels = `./channels/${channel.id}.json`;
             if (!fs.existsSync(file_channels)) {
                 fs.ensureFileSync(file_channels);
-                fs.appendFile(file_channels, channel, function (err) {
+                fs.appendFile(file_channels, JSON.stringify(channel), function (err) {
                     if (err) throw err;
                     console.log(`${file_channels} Saved!`);
                 });
