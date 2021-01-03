@@ -239,11 +239,12 @@ client.on("message", function (message) {
                     var esminuscula = isLowerCase(seiscaracteres);
                     var tieneespacios = /\s/.test(seiscaracteres);
                     var tienecarespeciales = /[^a-zA-Z0-9-_\-\/]/.test(seiscaracteres);
+		    var tieneseis = seiscaracteres.length === 6;
                     var esmencion = (seiscaracteres.substring(0,1) === '@');
                     var iscapitalized = isCapitalized(seiscaracteres);
-                    console.log(`[${seiscaracteres}] ${tienecarespeciales?r('car'):g('car')} ${tieneurl?r('url'):g('url')} ${esmayuscula?r('may'):g('may')} ${esminuscula?r('min'):g('min')} ${tieneespacios?r('esp'):g('esp')} ${esmencion?r('men'):g('men')} ${iscapitalized?r('cap'):g('cap')}`);
+                    console.log(`[${seiscaracteres}] ${tieneseis?g('sei'):r('sei')} ${tienecarespeciales?r('car'):g('car')} ${tieneurl?r('url'):g('url')} ${esmayuscula?r('may'):g('may')} ${esminuscula?r('min'):g('min')} ${tieneespacios?r('esp'):g('esp')} ${esmencion?r('men'):g('men')} ${iscapitalized?r('cap'):g('cap')}`);
                     
-                    if((!tienecarespeciales && !tieneurl && !esmayuscula && !esminuscula && !tieneespacios && !esmencion && !iscapitalized)){
+                    if((tieneseis && !tienecarespeciales && !tieneurl && !esmayuscula && !esminuscula && !tieneespacios && !esmencion && !iscapitalized)){
                         //var existecodigo = false;
                         //var now = new Date();
                         var file_name = './spins/' + moment().format('YYYYDDMM') + ".txt";
