@@ -238,7 +238,7 @@ client.on("message", function (message) {
                     var esmayuscula = isUpperCase(seiscaracteres);
                     var esminuscula = isLowerCase(seiscaracteres);
                     var tieneespacios = /\s/.test(seiscaracteres);
-                    var tienecarespeciales = /[^a-zA-Z\-\/]/.test(seiscaracteres);
+                    var tienecarespeciales = /[^a-zA-Z0-9-_\-\/]/.test(seiscaracteres);
                     var esmencion = (seiscaracteres.substring(0,1) === '@');
                     var iscapitalized = isCapitalized(seiscaracteres);
                     console.log(`[${seiscaracteres}] ${tienecarespeciales?r('car'):g('car')} ${tieneurl?r('url'):g('url')} ${esmayuscula?r('may'):g('may')} ${esminuscula?r('min'):g('min')} ${tieneespacios?r('esp'):g('esp')} ${esmencion?r('men'):g('men')} ${iscapitalized?r('cap'):g('cap')}`);
