@@ -1,6 +1,6 @@
 class ChannelElement {
     constructor(response) {
-            this.id = response.data.items[0].id.channelId;
+            this.id = response.data.items[0].id;
             this.description = response.data.items[0].snippet.description;
             this.createdAt = response.data.items[0].snippet.publishedAt;
             this.liveBroadcastContent = response.data.items[0].snippet.liveBroadcastContent;

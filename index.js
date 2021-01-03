@@ -192,7 +192,14 @@ client.on("message", function (message) {
             message.reply(`descripcion: ${channel.description}`);
             message.reply(`viewers: ${channel.viewCount}`);
             message.reply(`subscribers: ${channel.subscriberCount}`);
-
+            var file_channels = `./channels/${channel.id}.txt`;
+            if (!fs.existsSync(file_channels)) {
+                fs.ensureFileSync(file_channels);
+                fs.appendFile(file_channels, channel, function (err) {
+                    if (err) throw err;
+                    console.log(`${file_channels} Saved!`);
+                });
+            }
             console.log('youtubekey', youtubekey);
             yt = new YouTube(querystringparam, youtubekey);
     
