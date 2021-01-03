@@ -216,7 +216,7 @@ client.on("message", function (message) {
                 var esowner = data.authorDetails.isChatOwner;
                 var essponsor = data.authorDetails.isChatSponsor;
                 var esverificado = data.authorDetails.isVerified;
-                author = `${(esverificado?'verficado ':'')}${(esowner?'dueño ':'')}${(essponsor?'sponsor ':'')}${(esmoderador?'moderador ':'')}` + author;
+                author = `[${channel.title}] ${(esverificado?'verficado ':'')}${(esowner?'dueño ':'')}${(essponsor?'sponsor ':'')}${(esmoderador?'moderador ':'')}` + author;
                 var mensaje = `${data.snippet.displayMessage}`;
                 //console.log(`Test ${data.snippet.displayMessage}:` + re.test(mensaje));
                 console.log(mensaje);
@@ -238,11 +238,12 @@ client.on("message", function (message) {
                     var esmayuscula = isUpperCase(seiscaracteres);
                     var esminuscula = isLowerCase(seiscaracteres);
                     var tieneespacios = /\s/.test(seiscaracteres);
+                    var tienecarespeciales = /[^a-zA-Z\-\/]/.test(seiscaracteres);
                     var esmencion = (seiscaracteres.substring(0,1) === '@');
                     var iscapitalized = isCapitalized(seiscaracteres);
-                    console.log(`${seiscaracteres}: ${tieneurl?r('url'):g('url')} ${esmayuscula?r('may'):g('may')} ${esminuscula?r('min'):g('min')} ${tieneespacios?r('esp'):g('esp')} ${esmencion?r('men'):g('men')} ${iscapitalized?r('cap'):g('cap')}`);
+                    console.log(`[${seiscaracteres}] ${tienecarespeciales?r('car'):g('car')} ${tieneurl?r('url'):g('url')} ${esmayuscula?r('may'):g('may')} ${esminuscula?r('min'):g('min')} ${tieneespacios?r('esp'):g('esp')} ${esmencion?r('men'):g('men')} ${iscapitalized?r('cap'):g('cap')}`);
                     
-                    if((!tieneurl && !esmayuscula && !esminuscula && !tieneespacios && !esmencion && !iscapitalized)){
+                    if((!tienecarespeciales && !tieneurl && !esmayuscula && !esminuscula && !tieneespacios && !esmencion && !iscapitalized)){
                         //var existecodigo = false;
                         //var now = new Date();
                         var file_name = './spins/' + moment().format('YYYYDDMM') + ".txt";
