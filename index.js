@@ -227,10 +227,10 @@ client.on("message", function (message) {
                     var regexurl = new RegExp(expression);
                     var tieneurl = regexurl.test(mensaje)
                     //var t = 'www.google.com';
-                    let regexcode = new RegExp('[a-zA-Z0-9\-_]{6}$');
-                    var matchregex = regexcode.test(mensaje);
+                    //let regexcode = new RegExp('\b[a-zA-Z0-9\-_]{6}\b');
+                    var matchregex = /\b[a-zA-Z0-9]{6,50}\b/.test(mensaje);
                     if(matchregex){
-                        var matchtexts = regexcode.exec(mensaje);
+                        var matchtexts = /\b[a-zA-Z0-9]{6,50}\b/.exec(mensaje);
                         console.log(matchtexts[0]); 
                         seiscaracteres = matchtexts[0];
                     }
@@ -293,8 +293,8 @@ client.on("message", function (message) {
                 console.error(error);
                 message.reply(`Error ${error}`);
                 yt.stop();
-                console.log('la busqueda se detuvo');
-                message.reply(`la busqueda se detuvo`);
+                console.log(`la busqueda se detuvo ${ytkeyparam} [${channel.title}]`);
+                message.reply(`la busqueda se detuvo ${ytkeyparam} [${channel.title}]`);
             });
         }).catch(err => {
             console.log('error', err);
