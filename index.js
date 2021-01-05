@@ -184,10 +184,17 @@ client.on("message", function (message) {
         }
 
         buscarCanal(querystringparam).then(channel => {
-            console.log(channel);
-            console.log(channel.id);
-            console.log(channel.title);
-            console.log(channel.description);
+	    console.log('end buscar canal');
+
+	    if(Object.keys(channel).length === 0 && channel.constructor === Object){
+		console.log(`la busqueda se detuvo ${ytkeyparam} [canal no encontrado]`);
+		message.reply(`la busqueda se detuvo ${ytkeyparam} [canal no encontrado]`);
+		return null;
+	    }
+            console.log('channel',channel);
+            console.log('channel.id',channel.id);
+            console.log('channel.title',channel.title);
+            console.log('channel.description',channel.description);
             message.reply(`canal encontrado: ${channel.title}`);
             message.reply(`descripcion: ${channel.description}`);
             message.reply(`viewers: ${channel.viewCount}`);
@@ -242,7 +249,7 @@ client.on("message", function (message) {
 		    var tieneseis = seiscaracteres.length === 6;
                     var esmencion = (seiscaracteres.substring(0,1) === '@');
                     var iscapitalized = isCapitalized(seiscaracteres);
-                    console.log(`[${seiscaracteres}] ${tieneseis?g('sei'):r('sei')} ${tienecarespeciales?r('car'):g('car')} ${tieneurl?r('url'):g('url')} ${esmayuscula?r('may'):g('may')} ${esminuscula?r('min'):g('min')} ${tieneespacios?r('esp'):g('esp')} ${esmencion?r('men'):g('men')} ${iscapitalized?r('cap'):g('cap')}`);
+                    console.log(`${ytkeyparam} [${seiscaracteres}] ${tieneseis?g('sei'):r('sei')} ${tienecarespeciales?r('car'):g('car')} ${tieneurl?r('url'):g('url')} ${esmayuscula?r('may'):g('may')} ${esminuscula?r('min'):g('min')} ${tieneespacios?r('esp'):g('esp')} ${esmencion?r('men'):g('men')} ${iscapitalized?r('cap'):g('cap')}`);
                     
                     if((tieneseis && !tienecarespeciales && !tieneurl && !esmayuscula && !esminuscula && !tieneespacios && !esmencion && !iscapitalized)){
                         //var existecodigo = false;
@@ -272,20 +279,7 @@ client.on("message", function (message) {
                                 //message.reply(`${seiscaracteres} Saved`);
                             });
                         }
-                        // if(!existecodigo){
-                        //     var formatedmessage = `**${author}** | ${data.snippet.displayMessage}`;
-                        //     var codigo = `\`\`\`fix
-                        //     ${seiscaracteres}
-                        //     \`\`\``
-                        //     //message.channel.send(`**${author}** | ${data.snippet.displayMessage}`);
-                        //     message.channel.send(`${formatedmessage}`);
-                        //     message.channel.send(`${codigo}`);
-                        //     fs.appendFile(file_name, seiscaracteres + '\n', function (err) {
-                        //         if (err) throw err;
-                        //         console.log(`${file_name} ${seiscaracteres} Saved!`);
-                        //         message.reply(`${seiscaracteres} Saved`);
-                        //     });
-                        // }
+
                     }
                 }
             })
@@ -299,12 +293,15 @@ client.on("message", function (message) {
             });
         }).catch(err => {
             console.log('error', err);
+	    yt.stop();
+	    console.log(`la busqueda se detuvo ${ytkeyparam} ${err}`);
+	    message.reply(`la busqueda se detuvo ${ytkeyparam} ${err}`);
         });
     }
     else if (command === "ytstop") {
         yt.stop();
-        console.log('la busqueda se detuvo');
-        message.reply(`la busqueda se detuvo`);
+        console.log(`la busqueda se detuvo ${yt.id}`);
+        message.reply(`la busqueda se detuvo ${yt.id}`);
     }
 });
 
