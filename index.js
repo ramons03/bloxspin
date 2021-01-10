@@ -1,3 +1,4 @@
+const got = require('got');
 var moment = require('moment'); // require
 const axios = require('axios');
 const ChannelElement = require('./utils/ChannelElement');
@@ -123,11 +124,11 @@ async function buscarCanal(youtubeChannel) {
         console.log('buscarCanal');
         console.log(urlsearch);
         const response = await axios.get(urlsearch);
-        //console.log(response.data);
+        //console.log(response);
         return new ChannelElement(response);
     } catch (error) {
         //throw new Error('An error occurred while retrieving the channel.');
-        console.log('error', error);
+        console.log('error', error.message);
         return {};
     };
 }
@@ -194,8 +195,10 @@ client.on("message", function (message) {
             console.log('channel',channel);
             console.log('channel.id',channel.id);
             console.log('channel.title',channel.title);
-            console.log('channel.description',channel.description);
+            console.log('channel.title',channel.title);
+            console.log('channel.description',channel.mediumThumbnail);
             message.reply(`canal encontrado: ${channel.title}`);
+            message.reply(`thumbnail: ${channel.mediumThumbnail}`);
             message.reply(`descripcion: ${channel.description}`);
             message.reply(`viewers: ${channel.viewCount}`);
             message.reply(`subscribers: ${channel.subscriberCount}`);
